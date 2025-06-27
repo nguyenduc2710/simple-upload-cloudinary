@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cloudinary Upload</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2em; }
+    img { margin-top: 1em; max-width: 300px; }
+    .info { margin-top: 1em; font-size: 14px; }
+    .uploaded-url { word-break: break-all; margin-top: 1em; color: green; }
+  </style>
+</head>
+<body>
+  <h2>Local Upload Cloudinary Image</h2>
+  <input type="file" id="fileInput" accept="image/*"/>
+  <div class="info" id="fileInfo"></div>
+  <br>
+  <button onclick="uploadImage()">Upload</button>
+  <p id="status"></p>
+  <img id="preview" />
+  <div class="uploaded-url" id="uploadedUrl"></div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const preview = document.getElementById('preview');
+    const uploadedUrl = document.getElementById('uploadedUrl');
+    const status = document.getElementById('status');
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (file) {
+        const sizeKB = (file.size / 1024).toFixed(2);
+        const sizeText = sizeKB > 1024
+          ? (file.size / 1024 / 1024).toFixed(2) + ' MB'
+          : sizeKB + ' KB';
+
+        fileInfo.innerHTML = `
+          <strong>Name:</strong> ${file.name}<br/>
+          <strong>Size:</strong> ${sizeText}<br/>
+          <strong>Type:</strong> ${file.type}
+        `;
+
+        const reader = new FileReader();
+        reader.onload = e => preview.src = e.target.result;
+        reader.readAsDataURL(file);
+      } else {
+        fileInfo.innerHTML = '';
+        preview.src = '';
+        uploadedUrl.innerText = '';
+      }
+    });
+
+    async function uploadImage() {
+      const file = fileInput.files[0];
+      uploadedUrl.innerText = '';
+      status.textContent = '';
+
+      if (!file) {
+        status.textContent = 'Please select a file.';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', file);
+      status.textContent = 'Uploading...';
+
+      try {
+        const res = await fetch('/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (data.imageUrl) {
+          status.textContent = 'Upload successful!';
+          uploadedUrl.innerHTML = `<strong>Image URL:</strong><br><a href="${data.imageUrl}" target="_blank">${data.imageUrl}</a>`;
+        } else {
+          throw new Error('Upload failed');
+        }
+      } catch (err) {
+        console.error(err);
+        status.textContent = 'Upload failed: ' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
