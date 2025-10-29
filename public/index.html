@@ -11,7 +11,7 @@
   </style>
 </head>
 <body>
-  <h2>Local Upload Cloudinary Image</h2>
+  <h2>Local Upload Cloudinary Image (Optimized)</h2>
   <input type="file" id="fileInput" accept="image/*"/>
   <div class="info" id="fileInfo"></div>
   <br>
@@ -72,9 +72,21 @@
         });
 
         const data = await res.json();
+
+        //Cloudinary optimization flags
         if (data.imageUrl) {
+          // URL has f_auto,q_auto
+          let optimizedUrl = data.imageUrl;
+          if (optimizedUrl.includes('/upload/') && !optimizedUrl.includes('f_auto')) {
+            optimizedUrl = optimizedUrl.replace('/upload/', '/upload/f_auto,q_auto/');
+          }
+
           status.textContent = 'Upload successful!';
-          uploadedUrl.innerHTML = `<strong>Image URL:</strong><br><a href="${data.imageUrl}" target="_blank">${data.imageUrl}</a>`;
+          uploadedUrl.innerHTML = `
+            <strong>Optimized Image URL:</strong><br>
+            <a href="${optimizedUrl}" target="_blank">${optimizedUrl}</a>
+          `;
+          preview.src = optimizedUrl; 
         } else {
           throw new Error('Upload failed');
         }

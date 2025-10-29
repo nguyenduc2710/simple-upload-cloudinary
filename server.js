@@ -18,7 +18,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'Blog',
+    folder: 'Events/default/ABOUT',
     transformation: [{ quality: 'auto', fetch_format: 'auto' }],
   },
 });

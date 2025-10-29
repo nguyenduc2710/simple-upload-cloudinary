@@ -1,13 +1,18 @@
 {
   "name": "simple_upload_cloudinary",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "license": "MIT",
+  "scripts": {
+    "start": "nodemon server.js",
+    "debug": "ndb server.js"
+  },
   "dependencies": {
     "cloudinary": "^2.7.0",
     "dotenv": "^16.6.0",
     "express": "^5.1.0",
     "multer": "^2.0.1",
-    "multer-storage-cloudinary": "^4.0.0"
+    "multer-storage-cloudinary": "^4.0.0",
+    "nodemon": "^3.1.10"
   }
 }
